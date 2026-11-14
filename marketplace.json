@@ -1,0 +1,94 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Edgerunners",
+    "ru": "Edgerunners"
+  },
+  "description": {
+    "en": "Anime companion for DeepSeek Harness — an unofficial DSH adaptation of Alexanderadon/edgerunners.",
+    "ru": "Аниме-напарник для DeepSeek Harness — неофициальная адаптация Alexanderadon/edgerunners под DSH."
+  },
+  "metadata": {
+    "categories": {
+      "companion": {
+        "title": {
+          "en": "Companions",
+          "ru": "Напарники"
+        }
+      }
+    },
+    "labels": {
+      "anime": {
+        "title": {
+          "en": "Anime",
+          "ru": "Аниме"
+        }
+      },
+      "desktop": {
+        "title": {
+          "en": "Desktop",
+          "ru": "Рабочий стол"
+        }
+      }
+    },
+    "sortKeys": {
+      "stars": {
+        "title": {
+          "en": "Stars",
+          "ru": "Звёзды"
+        },
+        "order": "desc"
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-edgerunners",
+      "title": {
+        "en": "Edgerunners",
+        "ru": "Edgerunners"
+      },
+      "description": {
+        "en": "Anime companion in the corner of the DSH window. The hero reacts to the agent's tools, speaks in character, and a compact HUD shows the current file or command. Settings cover hero, sprite size (70–400 %), Russian or English language, and updates ported from the original mod.",
+        "ru": "Аниме-напарник в углу окна DSH. Герой реагирует на инструменты агента, говорит своим голосом, а компактный HUD показывает текущий файл или команду. В настройках — герой, размер спрайта (70–400 %), русский или английский язык и обновления из оригинального мода."
+      },
+      "icon": "icon.svg",
+      "author": "mordoreay",
+      "homepage": "https://github.com/mordoreay/dsh-edgerunners",
+      "repository": {
+        "url": "https://github.com/mordoreay/dsh-edgerunners"
+      },
+      "metadata": {
+        "category": "companion",
+        "keywords": [
+          "edgerunners",
+          "anime",
+          "companion",
+          "desktop pet",
+          "cyberpunk",
+          "deepseek harness",
+          "dsh"
+        ],
+        "labels": [
+          "desktop",
+          "anime"
+        ],
+        "sortKeys": {
+          "stars": 0
+        }
+      },
+      "versions": [
+        {
+          "version": "0.4.3",
+          "publishTimestamp": 1794675482,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/mordoreay/dsh-edgerunners",
+            "commit": "b970efaa0f1a5c8e70cd97b648f63e1762794779"
+          },
+          "engines": {}
+        }
+      ]
+    }
+  ]
+}
