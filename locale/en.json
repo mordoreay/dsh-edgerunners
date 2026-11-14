@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "Edgerunners",
+    "description": "Anime companion in the corner of the window. The hero reacts to what the agent does: reads, searches, edits, runs commands, fails, finishes. Settings choose the hero, the sprite size, the interface language, and check the original repository for updates.",
+    "detail": "docs/DETAIL.en.md"
+  },
+  "hud": {
+    "next": "Next hero"
+  }
+}

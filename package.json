@@ -1,0 +1,41 @@
+{
+  "name": "dsh-edgerunners",
+  "version": "0.4.3",
+  "private": true,
+  "type": "module",
+  "description": "Аниме-напарники edgerunners для DeepSeek Harness: питомец в углу окна и HUD над промптом",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./brain": "./brain.js",
+    "./update": "./update.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./assets/*": "./assets/*"
+  },
+  "files": [
+    "index.js",
+    "brain.js",
+    "update.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale",
+    "docs",
+    "icon.svg",
+    "assets"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}
