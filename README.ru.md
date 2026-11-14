@@ -1,3 +1,5 @@
+[English](README.md) | **Русский**
+
 # Edgerunners для DeepSeek Harness
 
 Аниме-напарник для [DeepSeek Harness](https://github.com/deepseek-ai/dsh): герой стоит в углу окна,
@@ -11,8 +13,6 @@
 > принадлежат автору оригинала.
 
 ![Роман за работой](docs/preview.gif)
-
-*English version: [README.md](README.md).*
 
 ## Герои
 

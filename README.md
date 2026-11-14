@@ -1,3 +1,5 @@
+**English** | [Русский](README.ru.md)
+
 # Edgerunners for DeepSeek Harness
 
 Anime companion for [DeepSeek Harness](https://github.com/deepseek-ai/dsh): a hero stands in the corner of the
@@ -11,8 +13,6 @@ current action and the file or command the agent is working on.
 > goes to the original author.
 
 ![Roman at work](docs/preview.gif)
-
-*Русская версия: [README.ru.md](README.ru.md).*
 
 ## Heroes
 
