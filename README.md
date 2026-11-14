@@ -27,31 +27,73 @@ current action and the file or command the agent is working on.
 
 ## Quick install
 
-You need DeepSeek Harness with plugin support (Desktop or Web). No admin rights, no separate process.
+You need DeepSeek Harness Desktop or Web. No admin rights, no separate process, no terminal.
 
-1. **Get the folder.** `git clone https://github.com/mordoreay/dsh-edgerunners.git`
-   or on GitHub: **Code → Download ZIP**, then unpack.
-2. **Open DSH → Settings → Plugins.**
-3. Press **Add plugin** and choose the folder that contains `package.json` (the repository root).
-4. Check that the **Edgerunners** row is enabled. If it was just installed and nothing appeared,
-   refresh the page (`Ctrl+R`).
-5. **Open Settings → Edgerunners** to choose a hero, size and language. The same panel opens from
-   the ⚙ button in the row under the pet.
+> **Where to click.** **Plugins** is an entry in the **left sidebar**. It is not
+> "Settings → Built-in plugins" — that page only shows what is already installed.
+>
+> The order is always the same: **Plugins → Add plugin → paste → Install**.
 
-To remove it, press the remove action on the Edgerunners row — the plugin keeps nothing outside its
-own folder except a small `edgerunners.json` in the DSH home directory.
+### Option A — from a GitHub link (easiest)
 
-### Install from the plugin index
+1. In the left sidebar of DSH click **Plugins**.
+2. Click **Add plugin** (top right of the Plugins page).
+3. Paste this line into the field:
 
-The repository also publishes a plugin market index (format 1):
+   ```
+   github:mordoreay/dsh-edgerunners
+   ```
+
+4. Click **Install** and wait until the progress dialog finishes.
+5. Find the **Edgerunners** row and make sure its switch is **on**.
+6. Refresh the page (`Ctrl+R`). The hero appears in the bottom-right corner.
+
+### Option B — from a folder (no git, works offline)
+
+1. On GitHub click **Code → Download ZIP** and unpack the archive.
+2. In DSH open **Plugins → Add plugin**.
+3. Paste the full path to the unpacked folder — the one that contains `package.json`:
+
+   ```
+   C:\Users\you\dsh-edgerunners
+   ```
+
+4. Click **Install**, wait, keep the **Edgerunners** row **on**, refresh the page (`Ctrl+R`).
+
+### Recommended install (pins the version, allows updates)
+
+Paste this instead of the short link — it installs exactly the published release:
+
+```
+git+https://github.com/mordoreay/dsh-edgerunners.git#b970efaa0f1a5c8e70cd97b648f63e1762794779
+```
+
+With a pinned commit DSH can offer newer versions in **Discover**.
+
+### After installation
+
+- The hero stands in the corner, the status line is right under it.
+- **Settings → Edgerunners** (or the **⚙** button under the hero): hero, size, language, updates.
+- To uninstall: **Plugins → Edgerunners → Remove**. Do it there, not by deleting the folder.
+
+### Something went wrong?
+
+| Symptom | What to do |
+|---|---|
+| `failed to import: ENOENT … bundle\index.js` | The plugin folder was deleted by hand. Restart DSH; if it repeats, **Plugins → Edgerunners → Remove**, restart, install again. |
+| No hero after install | Refresh the page (`Ctrl+R`) and check that the Edgerunners switch is on. |
+| `Cannot access GitHub` | The network blocks GitHub; use **Option B** with a folder. |
+
+### Install from the plugin index (Discover)
+
+The repository also publishes a plugin market index:
 
 ```
 https://raw.githubusercontent.com/mordoreay/dsh-edgerunners/main/marketplace.json
 ```
 
 Add this URL as an index source in the plugin market (Discover) settings of DSH, open the
-**Edgerunners** entry and press install. The index pins the exact commit of each version, so an
-install always fetches the code published in that release.
+**Edgerunners** entry and press install. The index pins the exact commit of each version.
 
 
 ## What it does

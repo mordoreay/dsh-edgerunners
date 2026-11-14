@@ -48,8 +48,9 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
 
 ## Enable and disable
 
-The plugin is a regular profile bundle: **Settings → Plugins → Edgerunners** — enable or disable it.
-Disabling removes the pet, the HUD and the settings page; enabling brings them back without a restart.
+The plugin is a regular profile bundle: **Plugins** in the left sidebar → the **Edgerunners** row —
+enable or disable it. Disabling removes the pet, the HUD and the settings page; enabling brings them
+back without a restart.
 
 ## Security
 
