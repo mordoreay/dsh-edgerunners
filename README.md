@@ -46,7 +46,9 @@ You need DeepSeek Harness Desktop or Web. No admin rights, no separate process, 
 
 4. Click **Install** and wait until the progress dialog finishes.
 5. Find the **Edgerunners** row and make sure its switch is **on**.
-6. Refresh the page (`Ctrl+R`). The hero appears in the bottom-right corner.
+6. **Restart DeepSeek Harness** — quit the app completely and open it again. A page refresh
+   (`Ctrl+R`) may not reload plugin code, the restart does. After the restart the hero appears in
+   the bottom-right corner.
 
 ### Option B — from a folder (no git, works offline)
 
@@ -58,7 +60,8 @@ You need DeepSeek Harness Desktop or Web. No admin rights, no separate process, 
    C:\Users\you\dsh-edgerunners
    ```
 
-4. Click **Install**, wait, keep the **Edgerunners** row **on**, refresh the page (`Ctrl+R`).
+4. Click **Install**, wait, keep the **Edgerunners** row **on**, then **restart DeepSeek Harness**
+   (quit completely and open it again) — the page refresh is not enough for plugin code.
 
 ### Recommended install (pins the version, allows updates)
 
@@ -81,7 +84,7 @@ With a pinned commit DSH can offer newer versions in **Discover**.
 | Symptom | What to do |
 |---|---|
 | `failed to import: ENOENT … bundle\index.js` | The plugin folder was deleted by hand. Restart DSH; if it repeats, **Plugins → Edgerunners → Remove**, restart, install again. |
-| No hero after install | Refresh the page (`Ctrl+R`) and check that the Edgerunners switch is on. |
+| No hero after install | **Restart DeepSeek Harness** (a page refresh may not be enough) and check that the Edgerunners switch is on. |
 | `Cannot access GitHub` | The network blocks GitHub; use **Option B** with a folder. |
 
 ### Install from the plugin index (Discover)

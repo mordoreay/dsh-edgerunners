@@ -1,6 +1,6 @@
 {
   "name": "dsh-edgerunners",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "private": true,
   "type": "module",
   "description": "Аниме-напарники edgerunners для DeepSeek Harness: питомец в углу окна и HUD над промптом",
