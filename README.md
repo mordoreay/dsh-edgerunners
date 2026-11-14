@@ -104,7 +104,8 @@ locale/               plugin metadata for the Plugins page
 
 - Original mod, characters, artwork and writing: **Alexander Kurchakov
   ([Alexanderadon](https://github.com/Alexanderadon))** — [original repository](https://github.com/Alexanderadon/edgerunners), MIT.
-- DeepSeek Harness adaptation: this repository, MIT. See [LICENSE](LICENSE).
+- DeepSeek Harness adaptation: this repository, MIT. See [LICENSE](LICENSE) and
+  [NOTICE.md](NOTICE.md) for third-party attribution.
 
 Fan project. Not affiliated with or endorsed by CD PROJEKT RED, Netflix or Studio Trigger.
 Cyberpunk: Edgerunners and its characters belong to their respective owners; the MIT licence covers

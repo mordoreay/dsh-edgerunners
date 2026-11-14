@@ -105,7 +105,8 @@ locale/               метаданные для страницы «Плаги�
 
 - Оригинальный мод, персонажи, арт и тексты: **Александр Курчаков
   ([Alexanderadon](https://github.com/Alexanderadon))** — [оригинальный репозиторий](https://github.com/Alexanderadon/edgerunners), MIT.
-- Адаптация под DeepSeek Harness: этот репозиторий, MIT. См. [LICENSE](LICENSE).
+- Адаптация под DeepSeek Harness: этот репозиторий, MIT. См. [LICENSE](LICENSE) и
+  [NOTICE.md](NOTICE.md) — там указаны права третьих лиц.
 
 Фан-проект. Не связан с CD PROJEKT RED, Netflix и Studio Trigger и не одобрен ими.
 Cyberpunk: Edgerunners и персонажи принадлежат их владельцам; лицензия MIT покрывает код,
