@@ -10,11 +10,13 @@ current action and the file or command the agent is working on.
 > without PowerShell or an external pet process. All credit for the characters, artwork and writing
 > goes to the original author.
 
-![Talia in the corner](assets/pet/talia/idle_01.png)
+![Roman at work](docs/preview.gif)
 
 *Русская версия: [README.ru.md](README.ru.md).*
 
 ## Heroes
+
+![Roman, Talia, Di and Wick](docs/heroes.png)
 
 | Hero | Who | How they talk |
 |---|---|---|
@@ -38,6 +40,19 @@ You need DeepSeek Harness with plugin support (Desktop or Web). No admin rights,
 
 To remove it, press the remove action on the Edgerunners row — the plugin keeps nothing outside its
 own folder except a small `edgerunners.json` in the DSH home directory.
+
+### Install from the plugin index
+
+The repository also publishes a plugin market index (format 1):
+
+```
+https://raw.githubusercontent.com/mordoreay/dsh-edgerunners/main/marketplace.json
+```
+
+Add this URL as an index source in the plugin market (Discover) settings of DSH, open the
+**Edgerunners** entry and press install. The index pins the exact commit of each version, so an
+install always fetches the code published in that release.
+
 
 ## What it does
 
