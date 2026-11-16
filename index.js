@@ -18,6 +18,8 @@ const ASSETS_DIR = path.join(ROOT, 'assets')
 const DATA_DIR = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
 const CONFIG_PATH = path.join(DATA_DIR, 'edgerunners.json')
 const COMPILED_PATH = path.join(DATA_DIR, 'edgerunners-upstream.json')
+const CODE_RESULT_PATH = path.join(DATA_DIR, 'edgerunners-code.json')
+const MARKET_URL = 'https://raw.githubusercontent.com/mordoreay/dsh-edgerunners/main/marketplace.json'
 
 const clampScale = (value) => Math.min(400, Math.max(70, Math.round(Number(value) || 100)))
 const LANGS = ['ru', 'en']
@@ -245,6 +247,147 @@ export function apply(ctx) {
     }
   }
 
+  // --- Обновление кода плагина -------------------------------------------
+
+  const code = {
+    installed: '',
+    latest: '',
+    pending: null,
+    updateKind: null,
+    supported: false,
+    checkedAt: 0,
+    running: false,
+    message: '',
+    error: '',
+    result: null,
+  }
+
+  const readSelfVersion = async () => {
+    try {
+      const manifest = JSON.parse(await readFile(path.join(ROOT, 'package.json'), 'utf8'))
+      return String(manifest.version || '')
+    } catch { return '' }
+  }
+
+  const codeStatus = () => ({
+    installed: code.installed,
+    latest: code.latest,
+    supported: code.supported,
+    updateKind: code.updateKind,
+    checkedAt: code.checkedAt,
+    running: code.running,
+    message: code.message,
+    error: code.error,
+    pending: code.pending ? { version: code.pending.version, commit: code.pending.commit, spec: code.pending.spec } : null,
+    result: code.result,
+  })
+
+  const codeReady = (async () => {
+    code.installed = await readSelfVersion()
+    try {
+      const data = JSON.parse(await readFile(CODE_RESULT_PATH, 'utf8'))
+      if (data && data.to && data.to === code.installed) code.result = data
+    } catch { /* результата ещё нет */ }
+  })()
+
+  async function checkCode() {
+    code.error = ''
+    code.message = ''
+    code.installed = await readSelfVersion()
+    const manager = ctx.get('pluginManager')
+    if (!manager) {
+      code.error = lx('Менеджер плагинов недоступен в этом профиле', 'The plugin manager is unavailable in this profile')
+      return codeStatus()
+    }
+    try {
+      const response = await fetch(MARKET_URL, {
+        signal: AbortSignal.timeout(15_000),
+        headers: { accept: 'application/json' },
+      })
+      if (!response.ok) throw new Error(`GitHub ответил ${response.status}`)
+      const index = await response.json()
+      const entry = (index.plugins || []).find((item) => item && item.name === 'dsh-edgerunners')
+      const versions = ((entry && entry.versions) || []).filter((item) => (
+        item && typeof item.version === 'string' && item.source && item.source.type === 'git'
+        && String(item.source.url).startsWith('https://github.com/mordoreay/dsh-edgerunners')
+      ))
+      const newer = versions.filter((item) => isNewer(item.version, code.installed))
+      newer.sort((left, right) => (isNewer(left.version, right.version) ? -1 : 1))
+      const best = newer[0]
+      code.latest = best ? best.version : code.installed
+      let self = null
+      try {
+        const bundles = await manager.listBundles()
+        self = Array.isArray(bundles) ? bundles.find((bundle) => bundle.name === 'dsh-edgerunners') : null
+      } catch { /* менеджер мог не отдать список — считаем, что обновление не поддержано */ }
+      code.updateKind = self ? (self.update || null) : null
+      code.supported = Boolean(best && code.updateKind === 'git')
+      code.pending = best ? {
+        version: best.version,
+        commit: String(best.source.commit || ''),
+        spec: `git+${String(best.source.url).replace(/\.git$/, '')}.git#${best.source.commit}`,
+      } : null
+      code.checkedAt = Date.now()
+      if (!best) {
+        code.message = lx('Установлена последняя версия', 'The latest version is installed')
+      } else if (code.updateKind !== 'git') {
+        code.message = lx(
+          'Плагин установлен из ветки — обновление кода недоступно. Переустанови его из индекса или по адресу с зафиксированным коммитом.',
+          'The plugin is installed from a branch, so self-update is unavailable. Reinstall it from the index or a pinned commit spec.',
+        )
+      } else {
+        code.message = lx(`Доступна версия ${best.version}`, `Version ${best.version} is available`)
+      }
+    } catch (error) {
+      code.error = String((error && error.message) || error)
+      code.message = lx(`Не удалось проверить обновления: ${code.error}`, `Update check failed: ${code.error}`)
+    }
+    return codeStatus()
+  }
+
+  async function updateCode() {
+    if (code.running) return { ok: false, busy: true, ...codeStatus() }
+    const manager = ctx.get('pluginManager')
+    if (!manager) {
+      code.error = lx('Менеджер плагинов недоступен', 'The plugin manager is unavailable')
+      return { ok: false, ...codeStatus() }
+    }
+    await checkCode()
+    if (!code.supported || !code.pending) return { ok: false, ...codeStatus() }
+    const target = { ...code.pending }
+    const from = code.installed
+    code.running = true
+    code.message = lx(`Ставлю v${target.version}…`, `Installing v${target.version}…`)
+    // Отвечаем сразу: updateBundle выгружает текущую копию плагина, и её код перестаёт работать.
+    globalThis.setTimeout(() => {
+      Promise.resolve()
+        .then(() => manager.updateBundle('dsh-edgerunners', target.version, { spec: target.spec }))
+        .then(async (result) => {
+          const outcome = result && result.result ? result.result : {}
+          const record = {
+            at: Date.now(),
+            from,
+            to: target.version,
+            step: result ? result.step : '',
+            application: outcome.application || '',
+            restartReason: outcome.restartReason || '',
+          }
+          try {
+            await mkdir(path.dirname(CODE_RESULT_PATH), { recursive: true })
+            await writeFile(CODE_RESULT_PATH, JSON.stringify(record), 'utf8')
+          } catch { /* отчёт не критичен */ }
+        })
+        .catch(async (error) => {
+          const record = { at: Date.now(), from, to: target.version, error: String((error && error.message) || error) }
+          try {
+            await mkdir(path.dirname(CODE_RESULT_PATH), { recursive: true })
+            await writeFile(CODE_RESULT_PATH, JSON.stringify(record), 'utf8')
+          } catch { /* молча */ }
+        })
+    }, 400)
+    return { ok: true, started: true, version: target.version, ...codeStatus() }
+  }
+
   // --- События DSH -------------------------------------------------------
 
   function notice(tool, input) {
@@ -461,13 +604,32 @@ export function apply(ctx) {
     return runUpdate()
   })
 
+  const codeRoute = async (request) => {
+    if (!sameOrigin(request)) return new Response('forbidden', { status: 403 })
+    await codeReady
+    return json(codeStatus())
+  }
+
+  const checkCodeHandler = handler(async () => {
+    await configReady
+    return checkCode()
+  })
+
+  const updateCodeHandler = handler(async () => {
+    await configReady
+    return updateCode()
+  })
+
   const server = ctx.webServer
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/state', resource: stateRoute }))
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/poke', resource: pokeRoute }))
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/hero', resource: heroRoute }))
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/config', resource: configRoute }))
+  ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/code', resource: codeRoute }))
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/settings', handler: saveSettings }))
   ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/update', handler: runUpdateHandler }))
+  ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/code/check', handler: checkCodeHandler }))
+  ctx.effect(() => server.register({ kind: 'exact', path: '/edgerunners/code/update', handler: updateCodeHandler }))
 
   // --- Команда /persona --------------------------------------------------
 

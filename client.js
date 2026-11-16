@@ -540,6 +540,17 @@ window.__ModuleLoader__.load({
         position: 'Положение',
         positionHint: 'Перетащи героя мышью в любое место окна — позиция сохранится. Кнопка возвращает его в угол.',
         resetPosition: 'Вернуть в угол',
+        code: 'Обновление плагина',
+        codeInstalled: (v) => `Установлено: v${v}`,
+        codeLatest: (v) => `Последняя: v${v}`,
+        codeCheck: 'Проверить',
+        codeUpdate: 'Обновить плагин',
+        codeUpdating: 'Обновляю…',
+        codeRestart: 'Обновлено — перезапусти DeepSeek Harness',
+        codeUpdated: (v) => `Обновлено до v${v}`,
+        codeFailed: 'Обновление не удалось, старая версия сохранена',
+        codeHint: 'Плагин установлен из ветки. Переустанови его по адресу с зафиксированным коммитом:',
+        codeHint2: 'Обновляет сам код плагина (клиент, хост, настройки) из репозитория. Кадры и реплики обновляются кнопкой «Проверить обновления» выше — из оригинала.',
         close: 'Закрыть настройки',
         error: 'Ошибка',
       },
@@ -573,6 +584,17 @@ window.__ModuleLoader__.load({
         position: 'Position',
         positionHint: 'Drag the hero anywhere in the window — the position is saved. The button puts it back in the corner.',
         resetPosition: 'Back to the corner',
+        code: 'Plugin update',
+        codeInstalled: (v) => `Installed: v${v}`,
+        codeLatest: (v) => `Latest: v${v}`,
+        codeCheck: 'Check',
+        codeUpdate: 'Update plugin',
+        codeUpdating: 'Updating…',
+        codeRestart: 'Updated — restart DeepSeek Harness',
+        codeUpdated: (v) => `Updated to v${v}`,
+        codeFailed: 'Update failed, the previous version is kept',
+        codeHint: 'The plugin is installed from a branch. Reinstall it from a pinned commit spec:',
+        codeHint2: 'Updates the plugin code itself (client, host, settings) from the repository. Frames and lines are updated by the “Check for updates” button above — from the original mod.',
         close: 'Close settings',
         error: 'Error',
       },
@@ -585,7 +607,10 @@ window.__ModuleLoader__.load({
       const [busy, setBusy] = useState('')
       const [notice, setNotice] = useState('')
       const [error, setError] = useState('')
+      const [code, setCode] = useState(null)
+      const [codeBusy, setCodeBusy] = useState('')
       const timer = useRef(0)
+      const codeTimer = useRef(0)
 
       const refresh = () => fetch('/edgerunners/config', { cache: 'no-store' })
         .then((response) => response.json())
@@ -594,11 +619,73 @@ window.__ModuleLoader__.load({
           setScale(next.scale)
         })
 
+      const loadCode = () => fetch('/edgerunners/code', { cache: 'no-store' })
+        .then((response) => response.json())
+        .then((next) => setCode(next))
+
       useEffect(() => {
         let alive = true
         refresh().catch((reason) => { if (alive) setError(String((reason && reason.message) || reason)) })
-        return () => { alive = false; clearTimeout(timer.current) }
+        loadCode().catch(() => { /* статус обновления необязателен */ })
+        return () => {
+          alive = false
+          clearTimeout(timer.current)
+          clearTimeout(codeTimer.current)
+        }
       }, [])
+
+      async function checkCodeUpdates() {
+        setCodeBusy('check')
+        try {
+          const response = await fetch('/edgerunners/code/check', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{}',
+          })
+          setCode(await response.json())
+        } catch (reason) {
+          setCode({ installed: '', latest: '', supported: false, error: String((reason && reason.message) || reason) })
+        } finally {
+          setCodeBusy('')
+        }
+      }
+
+      async function updatePluginCode() {
+        if (codeBusy) return
+        setCodeBusy('update')
+        try {
+          const response = await fetch('/edgerunners/code/update', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: '{}',
+          })
+          const started = await response.json()
+          if (!started || started.ok === false) {
+            setCode(started)
+            setCodeBusy('')
+            return
+          }
+          const target = started.version
+          let attempts = 0
+          const poll = async () => {
+            attempts += 1
+            try {
+              const status = await fetch('/edgerunners/code', { cache: 'no-store' }).then((item) => item.json())
+              setCode(status)
+              if (status && (status.installed === target || (status.result && !status.result.error && status.result.to === target))) {
+                setCodeBusy('')
+                return
+              }
+            } catch { /* плагин в этот момент перезагружается */ }
+            if (attempts < 30) codeTimer.current = setTimeout(poll, 2000)
+            else setCodeBusy('')
+          }
+          codeTimer.current = setTimeout(poll, 1500)
+        } catch (reason) {
+          setCode((previous) => ({ ...(previous || {}), error: String((reason && reason.message) || reason) }))
+          setCodeBusy('')
+        }
+      }
 
       async function save(patch) {
         setError('')
@@ -750,6 +837,45 @@ window.__ModuleLoader__.load({
             ),
             h('p', null,
               L.about1, h('b', null, 'Alexanderadon/edgerunners'), L.about2),
+          ),
+        ),
+
+        h('section', null,
+          h('h3', null, L.code),
+          h('div', { className: 'dsh-edgerunners-update' },
+            h('div', { className: 'dsh-edgerunners-version' },
+              code
+                ? `${L.codeInstalled(code.installed || '—')} · ${L.codeLatest(code.latest || code.installed || '—')}`
+                : L.loading),
+            code && code.message ? h('div', { className: 'dsh-edgerunners-version' }, code.message) : null,
+            code && code.error ? h('div', { className: 'dsh-edgerunners-error' }, code.error) : null,
+            code && code.result && !code.result.error
+              ? h('div', { className: 'dsh-edgerunners-notice' },
+                code.result.application === 'restart-required'
+                  ? L.codeRestart
+                  : L.codeUpdated(code.result.to || ''))
+              : null,
+            code && code.result && code.result.error
+              ? h('div', { className: 'dsh-edgerunners-error' }, L.codeFailed)
+              : null,
+            h('div', { className: 'dsh-edgerunners-row' },
+              h('button', {
+                type: 'button',
+                className: 'dsh-edgerunners-button',
+                disabled: Boolean(busy || codeBusy) || !code,
+                onClick: checkCodeUpdates,
+              }, codeBusy === 'check' ? L.checking : L.codeCheck),
+              h('button', {
+                type: 'button',
+                className: 'dsh-edgerunners-button',
+                disabled: Boolean(busy || codeBusy) || !code || !code.supported,
+                onClick: updatePluginCode,
+              }, codeBusy === 'update' ? L.codeUpdating : L.codeUpdate),
+            ),
+            code && code.pending && !code.supported
+              ? h('p', null, L.codeHint, ' ', h('code', null, code.pending.spec))
+              : null,
+            h('p', null, L.codeHint2),
           ),
         ),
 

@@ -56,6 +56,14 @@ The plugin is a regular profile bundle: **Plugins** in the left sidebar → the 
 enable or disable it. Disabling removes the pet, the HUD and the settings page; enabling brings them
 back without a restart.
 
+## Plugin code updates
+
+Settings has a **Plugin update** section: it reads the repository's `marketplace.json`, compares
+versions and asks the DSH plugin manager to replace the installed copy with the new one (pinned to a
+commit) — no removing and re-adding the plugin. It works only when the plugin was installed from a
+pinned commit spec (`git+https://…git#<commit>`); for a branch install the button is disabled and
+shows the spec to use. If DSH reports that a restart is required, restart the Harness.
+
 ## Security
 
 - Updates are downloaded over HTTPS from `Alexanderadon/edgerunners` only; content is checked by size

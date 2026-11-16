@@ -125,6 +125,7 @@ Add this URL as an index source in the plugin market (Discover) settings of DSH,
 | Size | 70–400 % | the hero stands at the right edge and grows leftwards |
 | Language | Русский / English | lines, HUD statuses, hero names and this page |
 | Position | drag the hero | remembered in the browser, reset with the button |
+| Plugin update | button | updates the plugin code itself from GitHub; needs a pinned install |
 | Updates | button | checks the original repository and ports new content |
 
 ## Updates from the original
