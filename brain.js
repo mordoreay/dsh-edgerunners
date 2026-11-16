@@ -274,14 +274,53 @@ const EN_LINES = {
   hello: ['Hi.'],
 }
 
+// Пасхалки с отсылками к сериалу. Это наши реплики, автопорт из оригинала их не затирает:
+// пул лежит поверх и срабатывает редко, без повтора подряд.
+const FLAVOR = {
+  kadr: {
+    work: [
+      ['Свет, камера, Найт-Сити.', 'Lights, camera, Night City.'],
+      ['Снимаю новый ХБД, не лезь в кадр.', 'Rolling a new XBD, stay out of frame.'],
+    ],
+    error: [
+      ['Плёнка сгорела, как башня Арасаки.', 'Footage burned like Arasaka Tower.'],
+    ],
+  },
+}
+const FLAVOR_CHANCE = 0.18
+const FLAVOR_KIND = {
+  read: 'work', scan: 'work', type: 'work', bash: 'work', walk: 'work', phone: 'work',
+  error: 'error', fail: 'error',
+}
+const flavorLast = new Map()
+
+function flavorLine(hero, key, lang) {
+  const kind = FLAVOR_KIND[key]
+  if (!kind) return ''
+  const pool = FLAVOR[hero] && FLAVOR[hero][kind]
+  if (!pool || !pool.length) return ''
+  if (Math.random() > FLAVOR_CHANCE) return ''
+  const marker = `${hero}:${kind}`
+  const last = flavorLast.get(marker)
+  let index = Math.floor(Math.random() * pool.length)
+  if (pool.length > 1 && index === last) index = (index + 1) % pool.length
+  flavorLast.set(marker, index)
+  const pair = pool[index]
+  return lang === 'en' ? pair[1] : pair[0]
+}
+
 export function pickLine(hero, key, target = '', lang = 'ru') {
+  const flavor = flavorLine(hero, key, lang)
+  if (flavor) return flavor
   const line = upstreamLine(hero, key, target, lang)
   if (line) return line
+  // Встроенные наборы хранят неудачу как `error`, а вызывающий код передаёт `fail`.
+  const fallback = key === 'fail' ? 'error' : key
   if (lang === 'en') {
-    const set = EN_LINES[key] || EN_LINES.idle
+    const set = EN_LINES[fallback] || EN_LINES.idle
     return set[Math.floor(Math.random() * set.length)] || set[0]
   }
-  const set = (R[hero] || R.kadr)[key] || R.kadr[key] || R.kadr.idle
+  const set = (R[hero] || R.kadr)[fallback] || R.kadr[fallback] || R.kadr.idle
   return set[Math.floor(Math.random() * set.length)] || set[0]
 }
 

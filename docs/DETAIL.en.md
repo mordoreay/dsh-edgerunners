@@ -30,6 +30,9 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
   and the "Back to the corner" button in the settings returns it to the right edge.
 - **⚙ in the HUD row** opens the settings panel over the window: hero, size, language, updates.
 - **Rest**: after 90 / 160 / 260 seconds without work the hero sits down, lies down and falls asleep.
+- **Rare nods**: sometimes a flavoured line replaces the usual one (currently Roman: "Lights,
+  camera, Night City", "Rolling a new XBD, stay out of frame", "Footage burned like Arasaka Tower").
+  It fires about 18 % of the time and never twice in a row.
 - **`/persona <hero>`** — pick a hero from the command line (`roman`, `talia`, `di`, `wick`).
 
 ## Settings
