@@ -65,6 +65,15 @@ back without a restart.
   compromise of that repository affects the plugin. The version and last check time are visible in
   the settings.
 
+## Image quality
+
+Frames are 420×372 PNGs from the original; the mod has no higher-resolution source. So that the
+sprite does not look soft on HiDPI screens and at 200–400 % scale, every frame has an `@2x.webp`
+neighbour (840×744, Lanczos plus a light unsharp mask) that the browser picks through `srcset` only
+on high-density displays and when the sprite is large enough. The original PNGs stay canonical and
+are the fallback; the autoport from the original updates them, while the 2× variants are rebuilt on
+release with `python tools/make2x.py [--quality 80]`.
+
 ## Limitations
 
 - Autoport transfers **data**: frames, clips, lines, hero names. The scene logic (which tool triggers

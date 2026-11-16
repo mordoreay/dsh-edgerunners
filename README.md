@@ -107,6 +107,8 @@ Add this URL as an index source in the plugin market (Discover) settings of DSH,
   a command plays the hero's signature work, an error is a facepalm, the end of a turn is a celebration.
 - **HUD under the character**: hero name, status word and the target the agent is working on
   (file name, search pattern or the first two words of a command; command values are never shown).
+- **Sharp on HiDPI** — every frame ships with a 2× WebP variant that the browser requests through
+  `srcset` only when the screen needs it.
 - **Click** the pet for a reaction, click the hero name to switch to the next hero.
 - **Rest**: after 90 / 160 / 260 seconds without work the hero sits down, lies down and falls asleep.
 - **`/persona <hero>`** — pick a hero from the command line (`roman`, `talia`, `di`, `wick`).

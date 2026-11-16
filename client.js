@@ -31,10 +31,14 @@ window.__ModuleLoader__.load({
 
     // Кадры раздаёт штатный маршрут пакетных ресурсов клиентских плагинов.
     // ?v= — версия оригинала, чтобы после обновления браузер не взял старый кадр из кеша.
-    const frameSrc = (hero, frame, version) => {
-      const base = `/plugins/dsh-edgerunners/assets/pet/${encodeURIComponent(hero)}/${encodeURIComponent(frame)}.png`
+    // Рядом с PNG лежит @2x.webp (tools/make2x.py): браузер берёт его через srcset
+    // только на экранах высокой плотности, PNG остаётся обычным и запасным.
+    const framePath = (hero, frame, extension, version) => {
+      const base = `/plugins/dsh-edgerunners/assets/pet/${encodeURIComponent(hero)}/${encodeURIComponent(frame)}${extension}`
       return version ? `${base}?v=${encodeURIComponent(version)}` : base
     }
+    const frameSrc = (hero, frame, version) => framePath(hero, frame, '.png', version)
+    const frameSrc2x = (hero, frame, version) => framePath(hero, frame, '@2x.webp', version)
 
     // --- Магазин состояния: один опрос на всю страницу --------------------
 
@@ -263,6 +267,7 @@ window.__ModuleLoader__.load({
         }, frame
           ? h('img', {
               src: frameSrc(hero, frame, version),
+              srcSet: `${frameSrc2x(hero, frame, version)} 2x`,
               width,
               height: layout.height,
               alt: '',
@@ -272,7 +277,12 @@ window.__ModuleLoader__.load({
         ),
         h(Hud),
         h('div', { className: 'dsh-edgerunners-preload', 'aria-hidden': true },
-          frames.map(name => h('img', { key: name, src: frameSrc(hero, name, version), alt: '' })),
+          frames.map(name => h('img', {
+            key: name,
+            src: frameSrc(hero, name, version),
+            srcSet: `${frameSrc2x(hero, name, version)} 2x`,
+            alt: '',
+          })),
         ),
         open ? h('div', { className: 'dsh-edgerunners-panel' },
           h('div', { className: 'dsh-edgerunners-panel-head' },
