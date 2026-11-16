@@ -26,6 +26,8 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
 - **HUD under the character**: hero name, status ("READING", "TYPING", "ERROR"…) and the target
   (file, search pattern or the first two words of a command; command values are never shown).
 - **Click the pet** for a reaction and a line; click the hero name to switch to the next hero.
+- **Drag anywhere**: grab the hero and move it anywhere in the window — the position is saved,
+  and the "Back to the corner" button in the settings returns it to the right edge.
 - **⚙ in the HUD row** opens the settings panel over the window: hero, size, language, updates.
 - **Rest**: after 90 / 160 / 260 seconds without work the hero sits down, lies down and falls asleep.
 - **`/persona <hero>`** — pick a hero from the command line (`roman`, `talia`, `di`, `wick`).
@@ -40,6 +42,8 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
   leftwards; the right margin stays 18 px.
 - **Language** — Russian or English: lines, HUD statuses, hero names and this page. Frames and clips
   do not depend on the language.
+- **Position** — drag the hero anywhere in the window; the position is stored in the browser and the
+  "Back to the corner" button resets it.
 - **Updates** — the "Check for updates" button: reads `.claude-plugin/plugin.json` in the original,
   compares versions and, if the original is newer (or autoport data is missing), downloads the archive
   from `codeload.github.com` and ports frames, clips, lines and hero data itself. Parsing runs in an

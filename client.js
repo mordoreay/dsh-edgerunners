@@ -29,6 +29,44 @@ window.__ModuleLoader__.load({
       return open
     }
 
+    // Позиция питомца: пока пользователь не перетащил его, работает привязка к правому краю.
+    // Перетащенная позиция хранится в localStorage как {left, bottom} в пикселях окна.
+    const POSITION_KEY = 'dsh-edgerunners.position'
+    const readPosition = () => {
+      try {
+        const raw = window.localStorage.getItem(POSITION_KEY)
+        if (!raw) return null
+        const value = JSON.parse(raw)
+        return Number.isFinite(value && value.left) && Number.isFinite(value && value.bottom)
+          ? { left: value.left, bottom: value.bottom }
+          : null
+      } catch { return null }
+    }
+    const position = { value: readPosition(), listeners: new Set() }
+    const savePosition = (value) => {
+      position.value = value
+      try {
+        if (value) window.localStorage.setItem(POSITION_KEY, JSON.stringify(value))
+        else window.localStorage.removeItem(POSITION_KEY)
+      } catch { /* приватный режим */ }
+      for (const listener of position.listeners) listener()
+    }
+    function usePosition() {
+      const [value, setValue] = useState(position.value)
+      useEffect(() => {
+        const listener = () => setValue(position.value)
+        position.listeners.add(listener)
+        return () => position.listeners.delete(listener)
+      }, [])
+      return value
+    }
+
+    // Держим питомца внутри окна: 8 px от краёв и 6 px снизу.
+    const clampPosition = (wanted, size, vw, vh) => ({
+      left: Math.min(Math.max(8, Math.round(wanted.left)), Math.max(8, Math.round(vw - 8 - size.width))),
+      bottom: Math.min(Math.max(6, Math.round(wanted.bottom)), Math.max(6, Math.round(vh - 8 - size.height))),
+    })
+
     // Кадры раздаёт штатный маршрут пакетных ресурсов клиентских плагинов.
     // ?v= — версия оригинала, чтобы после обновления браузер не взял старый кадр из кеша.
     // Рядом с PNG лежит @2x.webp (tools/make2x.py): браузер берёт его через srcset
@@ -146,8 +184,9 @@ window.__ModuleLoader__.load({
 .dsh-edgerunners-pet{position:fixed;bottom:6px;z-index:60;display:flex;flex-direction:column;
   align-items:center;gap:6px;pointer-events:none;user-select:none;-webkit-user-select:none;
   font-family:"Bahnschrift","Segoe UI",system-ui,sans-serif}
-.dsh-edgerunners-sprite{pointer-events:auto;cursor:pointer;background:none;border:0;padding:0;
+.dsh-edgerunners-sprite{pointer-events:auto;cursor:grab;touch-action:none;background:none;border:0;padding:0;
   display:block;line-height:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transform-origin:50% 100%}
+.dsh-edgerunners-pet.dsh-edgerunners-dragging .dsh-edgerunners-sprite{cursor:grabbing}
 .dsh-edgerunners-sprite img{display:block;image-rendering:auto}
 .dsh-edgerunners-sprite:hover{transform:translateY(-1px)}
 .dsh-edgerunners-preload{position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none}
@@ -222,6 +261,11 @@ window.__ModuleLoader__.load({
       const lastLine = useRef(-1)
       const open = usePanel()
       const vp = useViewport()
+      const manual = usePosition()
+      const [dragging, setDragging] = useState(false)
+      const containerRef = useRef(null)
+      const dragRef = useRef(null)
+      const layout = layoutPet(scene ? scene.scale : 100, vp.w, vp.h)
 
       const hero = scene && scene.hero ? scene.hero : 'kadr'
       const { frame, fx } = frameAt(scene, now)
@@ -239,15 +283,29 @@ window.__ModuleLoader__.load({
 
       useEffect(() => () => clearTimeout(bubbleTimer.current), [])
 
+      // После изменения размера окна или масштаба возвращаем питомца в пределы экрана.
+      useEffect(() => {
+        if (!manual) return
+        const element = containerRef.current
+        if (!element) return
+        const rect = element.getBoundingClientRect()
+        const next = clampPosition(manual, { width: rect.width, height: rect.height }, vp.w, vp.h)
+        if (next.left !== manual.left || next.bottom !== manual.bottom) savePosition(next)
+      }, [vp.w, vp.h, layout.column, layout.height, manual])
+
       if (!scene) return null
-      const layout = layoutPet(scene.scale, vp.w, vp.h)
       const width = layout.width
       const version = scene.upstream && scene.upstream.version ? scene.upstream.version : ''
       const frames = Array.isArray(scene.steps) ? Array.from(new Set(scene.steps.map(step => step[0]))) : []
 
+      const petStyle = manual
+        ? { left: `${manual.left}px`, bottom: `${manual.bottom}px`, width: `${layout.column}px` }
+        : { left: `${layout.left}px`, width: `${layout.column}px` }
+
       return h('div', {
-        className: 'dsh-edgerunners-pet',
-        style: { left: `${layout.left}px`, width: `${layout.column}px` },
+        className: `dsh-edgerunners-pet${dragging ? ' dsh-edgerunners-dragging' : ''}`,
+        ref: containerRef,
+        style: petStyle,
       },
         h('style', null, PET_CSS),
         bubble ? h('div', { className: 'dsh-edgerunners-bubble' },
@@ -256,12 +314,64 @@ window.__ModuleLoader__.load({
         ) : null,
         h('button', {
           type: 'button',
-          key: `${scene.seq}-${fx || 'still'}`,
           className: `dsh-edgerunners-sprite${fx === 'hop' ? ' dsh-edgerunners-hop' : ''}${fx === 'shake' ? ' dsh-edgerunners-shake' : ''}`,
-          title: str(scene.lang).poke,
-          'aria-label': str(scene.lang).poke,
-          onClick: () => {
-            // Ресурсные маршруты DSH принимают только GET.
+          title: str(scene.lang).dragHint,
+          'aria-label': str(scene.lang).dragHint,
+          onPointerDown: (event) => {
+            if (event.button !== 0) return
+            const element = containerRef.current
+            if (!element) return
+            const rect = element.getBoundingClientRect()
+            dragRef.current = {
+              id: event.pointerId,
+              startX: event.clientX,
+              startY: event.clientY,
+              left: rect.left,
+              bottom: vp.h - rect.bottom,
+              width: rect.width,
+              height: rect.height,
+              moved: false,
+              last: null,
+            }
+            if (event.currentTarget.setPointerCapture) event.currentTarget.setPointerCapture(event.pointerId)
+            setDragging(true)
+          },
+          onPointerMove: (event) => {
+            const drag = dragRef.current
+            if (!drag || drag.id !== event.pointerId) return
+            const dx = event.clientX - drag.startX
+            const dy = event.clientY - drag.startY
+            if (!drag.moved) {
+              if (Math.hypot(dx, dy) < 5) return
+              drag.moved = true
+            }
+            drag.last = clampPosition(
+              { left: drag.left + dx, bottom: drag.bottom - dy },
+              { width: drag.width, height: drag.height },
+              vp.w,
+              vp.h,
+            )
+            savePosition(drag.last)
+          },
+          onPointerUp: (event) => {
+            const drag = dragRef.current
+            if (!drag || drag.id !== event.pointerId) return
+            dragRef.current = null
+            setDragging(false)
+            if (drag.moved && drag.last) {
+              savePosition(drag.last)
+              return
+            }
+            // Короткое нажатие без смещения — это клик по герою.
+            fetch('/edgerunners/poke', { cache: 'no-store' }).catch(() => {})
+          },
+          onPointerCancel: () => {
+            dragRef.current = null
+            setDragging(false)
+          },
+          onKeyDown: (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
             fetch('/edgerunners/poke', { cache: 'no-store' }).catch(() => {})
           },
         }, frame
@@ -420,6 +530,10 @@ window.__ModuleLoader__.load({
         nextHero: 'Следующий герой',
         settings: 'Настройки edgerunners',
         poke: 'Позвать героя',
+        dragHint: 'Перетащить героя · клик — реакция',
+        position: 'Положение',
+        positionHint: 'Перетащи героя мышью в любое место окна — позиция сохранится. Кнопка возвращает его в угол.',
+        resetPosition: 'Вернуть в угол',
         close: 'Закрыть настройки',
         error: 'Ошибка',
       },
@@ -449,6 +563,10 @@ window.__ModuleLoader__.load({
         nextHero: 'Next hero',
         settings: 'Edgerunners settings',
         poke: 'Call the hero',
+        dragHint: 'Drag the hero · click for a reaction',
+        position: 'Position',
+        positionHint: 'Drag the hero anywhere in the window — the position is saved. The button puts it back in the corner.',
+        resetPosition: 'Back to the corner',
         close: 'Close settings',
         error: 'Error',
       },
@@ -593,6 +711,18 @@ window.__ModuleLoader__.load({
             }, label)),
           ),
           h('p', null, L.langHint),
+        ),
+
+        h('section', null,
+          h('h3', null, L.position),
+          h('div', { className: 'dsh-edgerunners-row' },
+            h('button', {
+              type: 'button',
+              className: 'dsh-edgerunners-button',
+              onClick: () => savePosition(null),
+            }, L.resetPosition),
+          ),
+          h('p', null, L.positionHint),
         ),
 
         h('section', null,
