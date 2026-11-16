@@ -297,23 +297,86 @@ const FLAVOR = {
     work: [
       ['Свет, камера, Найт-Сити.', 'Lights, camera, Night City.'],
       ['Снимаю новый ХБД, не лезь в кадр.', 'Rolling a new XBD, stay out of frame.'],
+      ['Кино умерло. Я снимаю его заново.', "Cinema died. I'm filming it back."],
+    ],
+    idle: [
+      ['Брайндэнс — не искусство. Камера — да.', "A braindance isn't art. A camera is."],
+    ],
+    done: [
+      ['Правда в кадре.', 'The truth is in the frame.'],
     ],
     error: [
       ['Плёнка сгорела, как башня Арасаки.', 'Footage burned like Arasaka Tower.'],
+    ],
+    poke: [
+      ['Не заслоняй объектив, я документирую.', "Don't block the lens, I'm documenting."],
+    ],
+  },
+  talia: {
+    work: [
+      ['Хром решает. Не они.', 'Chrome decides. Not them.'],
+    ],
+    done: [
+      ['Чисто. И никто мной не управлял.', 'Clean. And nobody ran me.'],
+    ],
+    error: [
+      ['Опять корпораты лезут.', 'Corpos again.'],
+    ],
+    poke: [
+      ['Убери руку, пока хром не решил за меня.', 'Hands off before the chrome decides.'],
+    ],
+    idle: [
+      ['Семья хотела контроль. Я выбрала хром.', 'Family wanted control. I chose chrome.'],
+    ],
+  },
+  di: {
+    work: [
+      ['Капри, прикрой меня в сети.', 'Capri, cover me in the net.'],
+    ],
+    done: [
+      ['Ещё один шаг к мести.', 'One more step to revenge.'],
+    ],
+    error: [
+      ['Они снова сожгли след.', 'They burned the trail again.'],
+    ],
+    poke: [
+      ['Не сейчас — Капри говорит.', 'Not now — Capri is talking.'],
+    ],
+    idle: [
+      ['Клан не вернуть. Но можно отомстить.', "The clan won't come back. Revenge can."],
+    ],
+  },
+  wick: {
+    work: [
+      ['Работаем. Хром помнит старое.', 'Working. The chrome remembers.'],
+    ],
+    done: [
+      ['Ещё одна работа. Ещё один шанс.', 'One more job. One more chance.'],
+    ],
+    error: [
+      ['Без хрома тяжело. Но живу.', "Without chrome it's hard. Still alive."],
+    ],
+    poke: [
+      ['Не трогай Короля, чом.', "Don't poke the King, choom."],
+    ],
+    read: [
+      ['Читаю. Ветеран читает медленно, но метко.', 'Reading. A veteran reads slow but true.'],
     ],
   },
 }
 const FLAVOR_CHANCE = 0.18
 const FLAVOR_KIND = {
-  read: 'work', scan: 'work', type: 'work', bash: 'work', walk: 'work', phone: 'work',
-  error: 'error', fail: 'error',
+  read: 'read', scan: 'work', type: 'work', bash: 'work', walk: 'work', phone: 'work',
+  done: 'done', error: 'error', fail: 'error', poke: 'poke', idle: 'idle', sleep: 'idle',
 }
 const flavorLast = new Map()
 
 function flavorLine(hero, key, lang) {
   const kind = FLAVOR_KIND[key]
   if (!kind) return ''
-  const pool = FLAVOR[hero] && FLAVOR[hero][kind]
+  const pools = FLAVOR[hero]
+  if (!pools) return ''
+  const pool = pools[kind] || (kind === 'read' ? pools.work : null)
   if (!pool || !pool.length) return ''
   if (Math.random() > FLAVOR_CHANCE) return ''
   const marker = `${hero}:${kind}`

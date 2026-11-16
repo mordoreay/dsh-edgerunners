@@ -126,7 +126,8 @@ Add this URL as an index source in the plugin market (Discover) settings of DSH,
 - **Click** the pet for a reaction, click the hero name to switch to the next hero.
 - **Drag anywhere** — grab the hero and move it anywhere in the window; the position is remembered,
   and **Settings → Position** puts it back in the corner.
-- **Rare nods to the series** — a few flavoured lines fire occasionally, never twice in a row.
+- **Rare nods to the series** — every hero has a few flavoured lines that fire occasionally,
+  never twice in a row, plus idle chatter while nothing is happening.
 - **Rest**: after 90 / 160 / 260 seconds without work the hero sits down, lies down and falls asleep.
 - **`/persona <hero>`** — pick a hero from the command line (`roman`, `talia`, `di`, `wick`).
 

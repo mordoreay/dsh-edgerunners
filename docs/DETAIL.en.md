@@ -39,9 +39,9 @@ The crew of the show's second season.
   and the "Back to the corner" button in the settings returns it to the right edge.
 - **⚙ in the HUD row** opens the settings panel over the window: hero, size, language, updates.
 - **Rest**: after 90 / 160 / 260 seconds without work the hero sits down, lies down and falls asleep.
-- **Rare nods**: sometimes a flavoured line replaces the usual one (currently Roman: "Lights,
-  camera, Night City", "Rolling a new XBD, stay out of frame", "Footage burned like Arasaka Tower").
-  It fires about 18 % of the time and never twice in a row.
+- **Rare nods**: about 18 % of the time a flavoured line replaces the usual one — every hero has
+  1–3 for each situation (idle, work, done, error, click), never twice in a row. While idle the hero
+  also drops a line every 45–75 seconds, so nods show up without any work too.
 - **`/persona <hero>`** — pick a hero from the command line (`roman`, `talia`, `di`, `wick`).
 
 ## Settings

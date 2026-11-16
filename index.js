@@ -139,6 +139,24 @@ export function apply(ctx) {
     }, 12_000)
   }
 
+  // Пока герой стоит без дела, он изредка бросает реплику — в том числе отсылку к сериалу.
+  let idleQuip
+  function scheduleIdleQuip() {
+    clearTimeout(idleQuip)
+    idleQuip = later(() => {
+      try {
+        if (!scene.busy && scene.clip === 'idle') {
+          const line = pickLine(scene.hero, 'idle', '', config.lang)
+          if (line) {
+            scene.line = line
+            scene.lineSeq += 1
+          }
+        }
+      } catch { /* молча */ }
+      scheduleIdleQuip()
+    }, 45_000 + Math.random() * 30_000)
+  }
+
   // --- Настройки и обновления -------------------------------------------
 
   const config = freshConfig()
@@ -666,6 +684,7 @@ export function apply(ctx) {
   ctx.effect(() => () => {
     clearLater()
     clearTimeout(restTimer)
+    clearTimeout(idleQuip)
   })
 
   // Приветствие — только после настроек и автопорта: иначе герой здоровается
@@ -674,5 +693,6 @@ export function apply(ctx) {
     if (scene.hero !== config.hero) scene.hero = config.hero
     greet()
     scheduleRest()
+    scheduleIdleQuip()
   })
 }
