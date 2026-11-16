@@ -61,10 +61,15 @@ window.__ModuleLoader__.load({
       return value
     }
 
-    // Держим питомца внутри окна: 8 px от краёв и 6 px снизу.
+    // Кадры 420×372 содержат прозрачные поля: у обычной стойки справа пусто 33–39 % ширины.
+    // Сдвигаем картинку вправо на медианный/80-й процентиль силуэта, чтобы герой стоял
+    // почти вплотную к краю окна. Значения посчитаны по кадрам (tools/frame-insets.py).
+    const SPRITE_INSETS = { kadr: 0.386, talia: 0.35, di: 0.36, wick: 0.336 }
+    const EDGE_MARGIN = 2
+    // Держим питомца внутри окна: 2 px от краёв и 2 px снизу.
     const clampPosition = (wanted, size, vw, vh) => ({
-      left: Math.min(Math.max(8, Math.round(wanted.left)), Math.max(8, Math.round(vw - 8 - size.width))),
-      bottom: Math.min(Math.max(6, Math.round(wanted.bottom)), Math.max(6, Math.round(vh - 8 - size.height))),
+      left: Math.min(Math.max(EDGE_MARGIN, Math.round(wanted.left)), Math.max(EDGE_MARGIN, Math.round(vw - EDGE_MARGIN - size.width))),
+      bottom: Math.min(Math.max(EDGE_MARGIN, Math.round(wanted.bottom)), Math.max(EDGE_MARGIN, Math.round(vh - EDGE_MARGIN - size.height))),
     })
 
     // Кадры раздаёт штатный маршрут пакетных ресурсов клиентских плагинов.
@@ -181,8 +186,8 @@ window.__ModuleLoader__.load({
     // --- Питомец ----------------------------------------------------------
 
     const PET_CSS = `
-.dsh-edgerunners-pet{position:fixed;bottom:6px;z-index:60;display:flex;flex-direction:column;
-  align-items:center;gap:6px;pointer-events:none;user-select:none;-webkit-user-select:none;
+.dsh-edgerunners-pet{position:fixed;bottom:2px;z-index:60;display:flex;flex-direction:column;
+  align-items:flex-end;gap:6px;pointer-events:none;user-select:none;-webkit-user-select:none;
   font-family:"Bahnschrift","Segoe UI",system-ui,sans-serif}
 .dsh-edgerunners-sprite{pointer-events:auto;cursor:grab;touch-action:none;background:none;border:0;padding:0;
   display:block;line-height:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transform-origin:50% 100%}
@@ -194,7 +199,7 @@ window.__ModuleLoader__.load({
   background:linear-gradient(160deg,rgba(12,14,18,.96),rgba(8,16,20,.96));color:#f2f7f8;
   font-size:12px;line-height:1.3;letter-spacing:.2px;border-radius:3px;
   box-shadow:0 0 0 1px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.5);position:relative}
-.dsh-edgerunners-bubble:before{content:"";position:absolute;left:-5px;top:8px;width:8px;height:8px;
+.dsh-edgerunners-bubble:before{content:"";position:absolute;right:-5px;top:8px;width:8px;height:8px;
   background:#fcee0a;transform:rotate(45deg)}
 .dsh-edgerunners-bubble b{color:#fcee0a;font-weight:600}
 .dsh-edgerunners-tag{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:#2ef2ff;opacity:.85}
@@ -243,12 +248,12 @@ window.__ModuleLoader__.load({
      */
     function layoutPet(scale, vw, vh) {
       const requested = SPRITE_BASE * (Number(scale) || 100) / 100
-      const byWidth = Math.max(96, vw - 24)
+      const byWidth = Math.max(96, vw - 8)
       const byHeight = Math.max(96, vh * 0.8 * FRAME_ASPECT)
       const width = Math.round(Math.min(requested, byWidth, byHeight))
       const height = Math.round(width / FRAME_ASPECT)
-      const column = Math.min(Math.max(PANEL_WIDTH, width), Math.max(120, vw - 16))
-      const left = Math.max(8, Math.round(vw - 18 - column))
+      const column = Math.min(Math.max(PANEL_WIDTH, width), Math.max(120, vw - 4))
+      const left = Math.max(EDGE_MARGIN, Math.round(vw - EDGE_MARGIN - column))
       return { width, height, left, column }
     }
 
@@ -382,6 +387,7 @@ window.__ModuleLoader__.load({
               height: layout.height,
               alt: '',
               draggable: false,
+              style: { transform: `translateX(${Math.round(width * (SPRITE_INSETS[hero] || 0))}px)` },
             })
           : null,
         ),
@@ -412,7 +418,7 @@ window.__ModuleLoader__.load({
     // --- HUD над промптом -------------------------------------------------
 
     const HUD_CSS = `
-.dsh-edgerunners-hud{display:flex;align-items:center;justify-content:center;gap:6px;padding:2px 0 0;
+.dsh-edgerunners-hud{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:2px 0 0;
   width:100%;max-width:238px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;
   color:var(--dsw-text-secondary,#8b98a5);font-family:"Bahnschrift","Segoe UI",system-ui,sans-serif;
   user-select:none;-webkit-user-select:none;white-space:nowrap}
