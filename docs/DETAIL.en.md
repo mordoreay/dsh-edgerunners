@@ -17,6 +17,15 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
 | **Di** | "Fixing.", "Works — don't touch.", "We'll resolder." |
 | **Wick** | "Working.", "Here's the plan…", "Clean job, kid." |
 
+### Who they are
+
+The crew of the show's second season.
+
+- **Roman Karax** — a young cinephile in a city that traded film for braindances; documents everything around him, looking for the truth.
+- **Talia Yang** — a corporate heiress who despises total control; raised under Maelstrom, aggressive and chrome-obsessed.
+- **Di** — a netrunner from the nomadic Snake Nation clan, avenging its destruction and merging with the AI construct Capri.
+- **Wick Kingsley (the King)** — a former legendary king of cyberpunks; lost his chrome and greatness, looking for redemption.
+
 ## What it does
 
 - **Pet in the window corner** — sprite animation from the original frames, about 49 clips: idle,

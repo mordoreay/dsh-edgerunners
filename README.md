@@ -25,6 +25,19 @@ current action and the file or command the agent is working on.
 | **Di** | "Fixing.", "Works — don't touch.", "We'll resolder." |
 | **Wick** | "Working.", "Here's the plan…", "Clean job, kid." |
 
+### Who they are
+
+The crew of the show's second season.
+
+- **Roman Karax** — a young cinephile in a city that traded film for braindances; he documents
+  everything around him, looking for the truth.
+- **Talia Yang** — a corporate heiress who despises total control; raised under Maelstrom's
+  influence, she is aggressive, chrome-obsessed and fiercely intolerant of being controlled.
+- **Di** — a netrunner from the nomadic Snake Nation clan, seeking revenge for its destruction;
+  over the story he merges with the AI construct Capri.
+- **Wick Kingsley (the King)** — a former legendary king of cyberpunks and a veteran; having lost
+  his chrome and his greatness, he lives in the shadow of his own fame and looks for redemption.
+
 ## Quick install
 
 You need DeepSeek Harness Desktop or Web. No admin rights, no separate process, no terminal.
