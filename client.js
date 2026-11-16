@@ -195,13 +195,16 @@ window.__ModuleLoader__.load({
 .dsh-edgerunners-sprite img{display:block;image-rendering:auto}
 .dsh-edgerunners-sprite:hover{transform:translateY(-1px)}
 .dsh-edgerunners-preload{position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none}
-.dsh-edgerunners-bubble{pointer-events:none;max-width:230px;padding:7px 10px 8px;border:1px solid #fcee0a;
+.dsh-edgerunners-sprite-wrap{position:relative;display:flex;justify-content:flex-end;pointer-events:none}
+.dsh-edgerunners-bubble{pointer-events:none;position:absolute;right:0;bottom:calc(100% + 8px);
+  width:236px;min-height:46px;box-sizing:border-box;padding:7px 10px 8px;border:1px solid #fcee0a;
   background:linear-gradient(160deg,rgba(12,14,18,.96),rgba(8,16,20,.96));color:#f2f7f8;
   font-size:12px;line-height:1.3;letter-spacing:.2px;border-radius:3px;
-  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.5);position:relative}
-.dsh-edgerunners-bubble:before{content:"";position:absolute;right:-5px;top:8px;width:8px;height:8px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 6px 18px rgba(0,0,0,.5);animation:dsh-ed-bubble 140ms ease-out}
+.dsh-edgerunners-bubble:before{content:"";position:absolute;right:18px;bottom:-5px;width:8px;height:8px;
   background:#fcee0a;transform:rotate(45deg)}
 .dsh-edgerunners-bubble b{color:#fcee0a;font-weight:600}
+@keyframes dsh-ed-bubble{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .dsh-edgerunners-tag{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:#2ef2ff;opacity:.85}
 .dsh-edgerunners-gear{pointer-events:auto;cursor:pointer;border:0;background:none;color:#8b98a5;
   font-size:14px;line-height:1;padding:2px 4px;border-radius:4px}
@@ -313,15 +316,16 @@ window.__ModuleLoader__.load({
         style: petStyle,
       },
         h('style', null, PET_CSS),
-        bubble ? h('div', { className: 'dsh-edgerunners-bubble' },
-          h('div', { className: 'dsh-edgerunners-tag' }, scene.name || HEROES[hero]),
-          bubble,
-        ) : null,
-        h('button', {
-          type: 'button',
-          className: `dsh-edgerunners-sprite${fx === 'hop' ? ' dsh-edgerunners-hop' : ''}${fx === 'shake' ? ' dsh-edgerunners-shake' : ''}`,
-          title: str(scene.lang).dragHint,
-          'aria-label': str(scene.lang).dragHint,
+        h('div', { className: 'dsh-edgerunners-sprite-wrap' },
+          bubble ? h('div', { className: 'dsh-edgerunners-bubble' },
+            h('div', { className: 'dsh-edgerunners-tag' }, scene.name || HEROES[hero]),
+            bubble,
+          ) : null,
+          h('button', {
+            type: 'button',
+            className: `dsh-edgerunners-sprite${fx === 'hop' ? ' dsh-edgerunners-hop' : ''}${fx === 'shake' ? ' dsh-edgerunners-shake' : ''}`,
+            title: str(scene.lang).dragHint,
+            'aria-label': str(scene.lang).dragHint,
           onPointerDown: (event) => {
             if (event.button !== 0) return
             const element = containerRef.current
@@ -390,6 +394,7 @@ window.__ModuleLoader__.load({
               style: { transform: `translateX(${Math.round(width * (SPRITE_INSETS[hero] || 0))}px)` },
             })
           : null,
+          ),
         ),
         h(Hud),
         h('div', { className: 'dsh-edgerunners-preload', 'aria-hidden': true },
