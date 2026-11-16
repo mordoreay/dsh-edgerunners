@@ -10,12 +10,12 @@ same heroes, clips and lines, rendered inside the DSH window without PowerShell.
 
 ## Heroes
 
-| Hero | Who | How they talk |
-|---|---|---|
-| **Roman** | kid blogger with a camera | "MOTOR!", "That's a wrap!", "Into the edit!" |
-| **Talia** | cyber ninja, netrunner | "Breaching…", "Clean.", "Into the shadows." |
-| **Di** | sleepy mechanic | "Fixing.", "Works — don't touch.", "We'll resolder." |
-| **Wick** | veteran fixer | "Working.", "Here's the plan…", "Clean job, kid." |
+| Hero | How they talk |
+|---|---|
+| **Roman** | "MOTOR!", "That's a wrap!", "Into the edit!" |
+| **Talia** | "Breaching…", "Clean.", "Into the shadows." |
+| **Di** | "Fixing.", "Works — don't touch.", "We'll resolder." |
+| **Wick** | "Working.", "Here's the plan…", "Clean job, kid." |
 
 ## What it does
 
