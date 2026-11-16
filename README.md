@@ -65,13 +65,14 @@ You need DeepSeek Harness Desktop or Web. No admin rights, no separate process, 
 
 ### Recommended install (pins the version, allows updates)
 
-Paste this instead of the short link — it installs exactly the published release:
+Install from the plugin index (see below) or paste a pinned spec taken from the latest release page:
 
 ```
-git+https://github.com/mordoreay/dsh-edgerunners.git#b970efaa0f1a5c8e70cd97b648f63e1762794779
+git+https://github.com/mordoreay/dsh-edgerunners.git#<commit from the release>
 ```
 
-With a pinned commit DSH can offer newer versions in **Discover**.
+A pinned install is what **Settings → Edgerunners → Plugin update** needs to replace the plugin in
+place later — no removing and re-adding it.
 
 ### After installation
 
