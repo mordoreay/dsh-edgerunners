@@ -79,6 +79,16 @@
       },
       "versions": [
         {
+          "version": "0.4.9",
+          "publishTimestamp": 1794848214,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/mordoreay/dsh-edgerunners",
+            "commit": "15a9ae437371425f015cc98319c6c7e9e75255fc"
+          },
+          "engines": {}
+        },
+        {
           "version": "0.4.8",
           "publishTimestamp": 1794847361,
           "source": {
